@@ -29,40 +29,40 @@ gemini_client = AsyncOpenAI(
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
-# guardrail_agent = Agent(
-#     name="Store Relevance Checker",
-#     instructions="""
-# You are checking if the user's input is either:
-# 1. A question or command related to an e-commerce store (add, delete,
-#    update, or list products, ask about the store).
-# 2. A general greeting (e.g., Hello, Hi, Assalam o Alaikum, etc.).
+guardrail_agent = Agent(
+    name="Store Relevance Checker",
+    instructions="""
+You are checking if the user's input is either:
+1. A question or command related to an e-commerce store (add, delete,
+   update, or list products, ask about the store).
+2. A general greeting (e.g., Hello, Hi, Assalam o Alaikum, etc.).
 
-# Mark it as True if it's a valid greeting or related to the store.
-# Mark it as False if it's a question unrelated to the store (e.g.,
-# solving math, asking about news or weather, etc.).
-# """,
-#     output_type=StoreRelevanceOutput,
-#     model=OpenAIChatCompletionsModel(
-#         model="gemini-1.5-flash",
-#         openai_client=gemini_client
-#     )
-# )
+Mark it as True if it's a valid greeting or related to the store.
+Mark it as False if it's a question unrelated to the store (e.g.,
+solving math, asking about news or weather, etc.).
+""",
+    output_type=StoreRelevanceOutput,
+    model=OpenAIChatCompletionsModel(
+        model="gemini-1.5-flash",
+        openai_client=gemini_client
+    )
+)
 
 
-# @input_guardrail
-# async def store_guardrail(
-#     ctx: RunContextWrapper[None],
-#     agent: Agent,
-#     input: str | list[TResponseInputItem]
-# ) -> GuardrailFunctionOutput:
-#     result = await Runner.run(guardrail_agent, input, context=ctx.context)
+@input_guardrail
+async def store_guardrail(
+    ctx: RunContextWrapper[None],
+    agent: Agent,
+    input: str | list[TResponseInputItem]
+) -> GuardrailFunctionOutput:
+    result = await Runner.run(guardrail_agent, input, context=ctx.context)
 
-#     return GuardrailFunctionOutput(
-#         output_info=result.final_output,
-#         tripwire_triggered=not (
-#             result.final_output.is_store_related_or_greeting
-#         ),
-#     )
+    return GuardrailFunctionOutput(
+        output_info=result.final_output,
+        tripwire_triggered=not (
+            result.final_output.is_store_related_or_greeting
+        ),
+    )
 
 # Define the agent
 agent = Agent[UserContext](
@@ -88,7 +88,7 @@ any issues clearly.
         model="gemini-1.5-flash",
         openai_client=gemini_client
     ),
-    # input_guardrails=[store_guardrail],
+    input_guardrails=[store_guardrail],
     tools=[
         fetch_all_billboards,
         fetch_billboard_by_id,
